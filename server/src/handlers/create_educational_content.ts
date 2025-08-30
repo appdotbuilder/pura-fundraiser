@@ -1,15 +1,25 @@
+import { db } from '../db';
+import { educationalContentTable } from '../db/schema';
 import { type CreateEducationalContentInput, type EducationalContent } from '../schema';
 
-export async function createEducationalContent(input: CreateEducationalContentInput): Promise<EducationalContent> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is creating new educational content and persisting it in the database.
-    // Should set proper creation and update timestamps.
-    return {
-        id: 0, // Placeholder ID
+export const createEducationalContent = async (input: CreateEducationalContentInput): Promise<EducationalContent> => {
+  try {
+    // Insert educational content record
+    const result = await db.insert(educationalContentTable)
+      .values({
         title: input.title,
         category: input.category,
-        content: input.content,
-        created_at: new Date(),
-        updated_at: new Date()
-    } as EducationalContent;
-}
+        content: input.content
+        // created_at and updated_at will be automatically set by database defaults
+      })
+      .returning()
+      .execute();
+
+    // Return the created educational content
+    const educationalContent = result[0];
+    return educationalContent;
+  } catch (error) {
+    console.error('Educational content creation failed:', error);
+    throw error;
+  }
+};

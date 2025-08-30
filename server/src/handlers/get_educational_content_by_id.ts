@@ -1,8 +1,25 @@
+import { db } from '../db';
+import { educationalContentTable } from '../db/schema';
+import { eq } from 'drizzle-orm';
 import { type EducationalContent } from '../schema';
 
-export async function getEducationalContentById(id: number): Promise<EducationalContent | null> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is fetching a specific educational content item by ID.
-    // Returns null if content with given ID doesn't exist.
-    return null;
-}
+export const getEducationalContentById = async (id: number): Promise<EducationalContent | null> => {
+  try {
+    // Query educational content by ID
+    const results = await db.select()
+      .from(educationalContentTable)
+      .where(eq(educationalContentTable.id, id))
+      .execute();
+
+    // Return null if no content found
+    if (results.length === 0) {
+      return null;
+    }
+
+    // Return the first result (ID is unique)
+    return results[0];
+  } catch (error) {
+    console.error('Get educational content by ID failed:', error);
+    throw error;
+  }
+};
